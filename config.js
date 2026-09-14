@@ -1,107 +1,85 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>歩行者交通マナー違反タイプ診断</title>
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- App Stylesheet -->
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+// 診断設定データ
+window.DIAGNOSTIC_CONFIG = {
+  "name": "歩行者の交通マナー違反タイプ診断",
+  "axes": [
+    {
+      "id": "SP",
+      "name": "時間・速度意識",
+      "positive": { "code": "H", "label": "せかせか (H)" },
+      "negative": { "code": "C", "label": "ゆったり (C)" }
+    },
+    {
+      "id": "RL",
+      "name": "規範・ルール意識",
+      "positive": { "code": "G", "label": "ルール厳守 (G)" },
+      "negative": { "code": "F", "label": "自己都合 (F)" }
+    },
+    {
+      "id": "AT",
+      "name": "周囲配慮・他者意識",
+      "positive": { "code": "K", "label": "周囲配慮 (K)" },
+      "negative": { "code": "I", "label": "周囲無視 (I)" }
+    }
+  ],
+  "questions": [
+    // 軸1: SP (時間・速度意識)
+    { "text": "青信号に変わる数秒前からフライングして歩き始めることが多い。", "axis": "SP", "direction": 1 },
+    { "text": "電車の発車時刻や約束の時間に遅れそうな時は、周りを追い越すために早足や小走りで突き進む。", "axis": "SP", "direction": 1 },
+    { "text": "狭い歩道で前に遅い人がいると、すきまを無理にすり抜けて追い越そうとする。", "axis": "SP", "direction": 1 },
+    { "text": "目的地に急ぐ必要がない時は、周囲のペースに合わせてゆっくり歩く。", "axis": "SP", "direction": -1 },
 
-  <!-- App Main Content -->
-  <main class="app-main">
-    <section class="diagnostic-sandbox" id="diagnostic-view">
-      <div class="diagnostic-card">
+    // 軸2: RL (規範・ルール意識)
+    { "text": "「ここを渡った方が早い」と思えば、横断歩道がない場所でも平気で斜め横断をする。", "axis": "RL", "direction": -1 },
+    { "text": "誰も見ていない深夜の交差点であっても、赤信号なら絶対に足をとめて待つ。", "axis": "RL", "direction": 1 },
+    { "text": "歩行者用信号が点滅し始めたら、渡りきれそうになくてもダッシュして飛び込む。", "axis": "RL", "direction": -1 },
+    { "text": "歩道橋や地下道がある場所では、遠回りになっても指定の場所を通る。", "axis": "RL", "direction": 1 },
 
-        <!-- INTRO SCREEN -->
-        <div class="screen active" id="screen-intro">
-          <h1 class="intro-title" id="intro-title">歩行者交通マナー
-違反タイプ診断</h1>
-          <button class="btn" id="start-btn">
-            診断を開始する
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </div>
-
-        <!-- QUESTION SCREEN -->
-        <div class="screen" id="screen-question">
-          <div class="progress-container">
-            <div class="progress-header">
-              <span id="question-progress-text"></span>
-              <span id="question-progress-percent"></span>
-            </div>
-            <div class="progress-bar-bg">
-              <div class="progress-bar-fill" id="question-progress-bar"></div>
-            </div>
-          </div>
-
-          <div class="question-box">
-            <h2 class="question-text" id="question-text"></h2>
-          </div>
-
-          <!-- Likert 5-choice Scale -->
-          <div class="likert-scale">
-            <span class="likert-label-extreme agree">そう思う</span>
-            <div class="likert-option" data-value="3"><div class="likert-dot"></div></div>
-            <div class="likert-option" data-value="1"><div class="likert-dot"></div></div>
-            <div class="likert-option" data-value="0"><div class="likert-dot"></div></div>
-            <div class="likert-option" data-value="-1"><div class="likert-dot"></div></div>
-            <div class="likert-option" data-value="-3"><div class="likert-dot"></div></div>
-            <span class="likert-label-extreme disagree">そう思わない</span>
-          </div>
-
-          <div class="question-footer-nav">
-            <button class="btn-outline" id="prev-btn" disabled>
-              <i class="fa-solid fa-arrow-left"></i>
-              前へ
-            </button>
-            <button class="btn-outline" id="reset-test-btn">
-              やり直す
-            </button>
-          </div>
-        </div>
-
-        <!-- RESULT SCREEN -->
-        <div class="screen" id="screen-result">
-          <div style="text-align: center; margin-bottom: 24px;">
-            <div class="result-type-code" id="result-code"></div>
-            <h2 class="result-title" id="result-title"></h2>
-            <div class="result-quote" id="result-quote"></div>
-          </div>
-
-          <div class="result-description-card" id="result-desc"></div>
-
-          <!-- Undefined Code Warning -->
-          <div class="result-undefined-warning" id="result-warning" style="display: none;">
-            <i class="fa-solid fa-circle-exclamation"></i>
-            <div>
-              <strong>未定義タイプです</strong><br>
-              <span id="result-warning-text"></span>
-            </div>
-          </div>
-
-          <h3 class="result-axes-title">特性の割合</h3>
-          <div class="axis-chart-list" id="axis-charts"></div>
-
-          <div class="result-actions">
-            <button class="btn" id="restart-btn">診断をもう一度受ける</button>
-          </div>
-        </div>
-
-      </div>
-    </section>
-  </main>
-
-  <!-- Configuration data (edit this file to customize the diagnostic) -->
-  <script src="config.js"></script>
-  <!-- Application logic -->
-  <script src="app.js"></script>
-</body>
-</html>
+    // 軸3: AT (周囲配慮・他者意識)
+    { "text": "歩きスマホをしていて、人とぶつかりそうになったり障害物に気づかないことがよくある。", "axis": "AT", "direction": -1 },
+    { "text": "すれ違う人や後ろを歩く人の邪魔にならないよう、常に端を歩くなど意識している。", "axis": "AT", "direction": 1 },
+    { "text": "混雑している駅の改札やエスカレーター前で、後ろが詰まっていても気にせず自分のペースで動く。", "axis": "AT", "direction": -1 },
+    { "text": "狭い通路を家族や友人と歩くときは、後ろの人のために一列になるよう配慮する。", "axis": "AT", "direction": 1 }
+  ],
+  "results": {
+    "HGK": {
+      "title": "マナー番長タイプ",
+      "quote": "「なんでみんなもっとスムーズに歩かないの！？」",
+      "description": "交通ルールはきっちり守り、目的地へ急ぐ優等生……と思いきや、前をのろのろ歩く人やマナー違反者に内心キーキー苛立っている正義の歩行者。ルール違反を絶対に許さない反面、急ぐあまりイライラを周囲に振りまきがちです。"
+    },
+    "HGI": {
+      "title": "爆走直線タイプ",
+      "quote": "「最短ルートを最高速度で通過する」",
+      "description": "ルールを守りつつ、脇目も振らず目的地へ一直線に突き進む歩行マシーン。周りの人を障害物として認識し、最速で避けていくため事故は起こしにくいものの、パーソナルスペースを強引に削って進むため周囲をヒヤヒヤさせます。"
+    },
+    "HFK": {
+      "title": "お調子者タイプ",
+      "quote": "「みんなが渡るなら…急いでるし行っちゃえ！」",
+      "description": "世間体や他人の目を気にする一方、「赤信号、みんなで渡れば怖くない」を体現するタイプ。周りが渡り始めると便乗する。集団になると強気になるものの、周りから見えないように振舞ったり被害者ぶる傾向も？"
+    },
+    "HFI": {
+      "title": "自己中心タイプ",
+      "quote": "「どけ！どけ！！どけ！！！」",
+      "description": "自分の都合とスピードが最優先の歩行型危険分子。赤信号のフライングや車道の斜め横断、歩行者のすり抜けを平気で行います。周囲への配慮も皆無なため、いつ事故を起こしてもおかしくない最も注意が必要なタイプです。"
+    },
+    "CGK": {
+      "title": "優等生タイプ",
+      "quote": "「お先にどうぞ。安全第一でいきましょう。」",
+      "description": "心に常に余裕があり、交通ルールも周囲への配慮もカンペキな歩行者のお手本。狭い道では端により、歩行者用信号も点滅したら無理せず立ち止まります。あまりにも完璧すぎて、周囲からは不気味に思われているかもしれません。"
+    },
+    "CGI": {
+      "title": "無自覚タイプ",
+      "quote": "「えっ、後ろ混んでる？気づかなかった…」",
+      "description": "ルールはきちんと守るものの、周囲への関心が薄く自分の世界に入り込んでいるタイプ。のんびり歩くため、狭い道や改札の前で後ろに大行列を作っていても本人は全く気づきません。悪気がないぶん周囲を困惑させます。"
+    },
+    "CFK": {
+      "title": "空気読み同調タイプ",
+      "quote": "「赤信号だけど…周りの人が渡るならついていくね」",
+      "description": "おっとりした性格ですが、主体性が低く流されやすいタイプ。自分からはルールを破りませんが、周りの人がフライングや横断を始めると「あ、そういう雰囲気？」と流されてしまいます。"
+    },
+    "CFI": {
+      "title": "ながら歩きタイプ",
+      "quote": "「あ、ここ車道だった？スマホ見てて気づかなかった…」",
+      "description": "スマホ画面や音楽に全集中し、現実世界から離脱しているながら歩きのプロ。信号の変化にも周囲の状況にも疎く、無意識に突っ込んでいきます。事故に遭う前に、はやく現実世界へ帰還してください。"
+    }
+  }
+};
