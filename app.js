@@ -130,10 +130,10 @@ function finishDiagnostic() {
   let typeCode = "";
   const axisBreakdowns = [];
 
-  config.axes.forEach(axis => {
+  config.axes.forEach((axis, axisIndex) => {
     const score = scores[axis.id];
     const max = maxScores[axis.id];
-    const isPositive = score >= 0;
+    const isPositive = resolveAxisPolarity(axis, score, axisIndex);
     typeCode += isPositive ? axis.positive.code : axis.negative.code;
 
     // Normalizing percentage splits
@@ -195,6 +195,29 @@ function finishDiagnostic() {
   });
 
   showScreen('screen-result');
+}
+
+function resolveAxisPolarity(axis, score, axisIndex) {
+  if (score > 0) return true;
+  if (score < 0) return false;
+
+  const signedAnswers = config.questions
+    .map((q, idx) => q.axis === axis.id ? answers[idx] * (q.direction || 1) : null)
+    .filter(value => value !== null);
+
+  const positiveCount = signedAnswers.filter(value => value > 0).length;
+  const negativeCount = signedAnswers.filter(value => value < 0).length;
+
+  if (positiveCount !== negativeCount) {
+    return positiveCount > negativeCount;
+  }
+
+  const firstDirectionalAnswer = signedAnswers.find(value => value !== 0);
+  if (firstDirectionalAnswer !== undefined) {
+    return firstDirectionalAnswer > 0;
+  }
+
+  return axisIndex % 2 === 0;
 }
 
 function showScreen(screenId) {
