@@ -195,6 +195,53 @@ function finishDiagnostic() {
   });
 
   showScreen('screen-result');
+
+  // GASへ診断結果を送信
+  sendResultToGAS(typeCode, resultMatch ? resultMatch.title : '未定義', scores, answers);
+}
+
+function sendResultToGAS(typeCode, typeTitle, scores, answers) {
+  const gasUrl = config && config.gasUrl ? config.gasUrl.trim() : '';
+  const statusEl = document.getElementById('gas-status');
+  if (!gasUrl) {
+    if (statusEl) statusEl.style.display = 'none';
+    return;
+  }
+
+  if (statusEl) {
+    statusEl.style.display = 'flex';
+    statusEl.className = 'gas-status sending';
+    statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 診断結果を送信中...';
+  }
+
+  const payload = {
+    timestamp: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
+    typeCode: typeCode,
+    typeTitle: typeTitle,
+    scores: scores,
+    answers: answers
+  };
+
+  fetch(gasUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8',
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => {
+    if (statusEl) {
+      statusEl.className = 'gas-status success';
+      statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> 結果を集計用に送信しました';
+    }
+  })
+  .catch(err => {
+    console.error('GAS Send Error:', err);
+    if (statusEl) {
+      statusEl.className = 'gas-status error';
+      statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> 結果の送信に失敗しました';
+    }
+  });
 }
 
 function resolveAxisPolarity(axis, score, axisIndex) {
