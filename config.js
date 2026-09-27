@@ -1,5 +1,7 @@
 // 診断設定データ
 window.DIAGNOSTIC_CONFIG = {
+  // Google Apps Script (GAS) Web アプリの URL（空の場合は送信されません）
+  "gasUrl": "https://script.google.com/macros/s/AKfycbwBeKPKP1p80Mzh7g7Hs7WmFetn2cgBIhaw4YID3aq6U6ZTkkPoemoIaxFzI0XG9iBRgw/exec",
   "name": "歩行者の交通マナー違反タイプ診断",
   "axes": [
     {
