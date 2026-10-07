@@ -166,6 +166,30 @@ function finishDiagnostic() {
     resultWarning.style.display = 'flex';
   }
 
+  // 動画リンクの更新
+  const videoContainer = document.getElementById('result-video-container');
+  if (videoContainer) {
+    const videoLinks = window.DIAGNOSTIC_VIDEO_LINKS || {};
+    const videoUrl = (videoLinks[typeCode] || '').trim();
+
+    if (videoUrl) {
+      videoContainer.innerHTML = `
+        <a href="${videoUrl}" target="_blank" rel="noopener noreferrer" class="result-video-link active">
+          <i class="fa-solid fa-circle-play video-icon"></i>
+          <span>ショートムービーでこのタイプの特徴を見てみよう！！</span>
+          <i class="fa-solid fa-arrow-up-right-from-square external-icon"></i>
+        </a>
+      `;
+    } else {
+      videoContainer.innerHTML = `
+        <div class="result-video-link disabled">
+          <i class="fa-solid fa-film video-icon"></i>
+          <span>動画は準備中です</span>
+        </div>
+      `;
+    }
+  }
+
   // Draw chart metrics
   axisCharts.innerHTML = '';
   axisBreakdowns.forEach(item => {
