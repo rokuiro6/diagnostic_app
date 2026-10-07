@@ -422,10 +422,73 @@ body {
   border: 1px solid var(--border-card);
   border-radius: 18px;
   padding: 24px;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
   line-height: 1.7;
   color: #e2e8f0;
   font-size: 1rem;
+}
+
+/* Result Video Link Container */
+.result-video-container {
+  margin-bottom: 32px;
+}
+
+.result-video-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.result-video-link.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.2));
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+}
+
+.result-video-link.active:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.35));
+  border-color: rgba(168, 85, 247, 0.7);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(168, 85, 247, 0.3);
+  color: #ffffff;
+}
+
+.result-video-link.active .video-icon {
+  font-size: 1.35rem;
+  color: #c084fc;
+  transition: transform 0.3s ease;
+}
+
+.result-video-link.active:hover .video-icon {
+  transform: scale(1.15);
+  color: #e9d5ff;
+}
+
+.result-video-link.active .external-icon {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.result-video-link.disabled {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  color: var(--text-muted);
+  cursor: default;
+  opacity: 0.85;
+}
+
+.result-video-link.disabled .video-icon {
+  font-size: 1.15rem;
+  opacity: 0.6;
 }
 
 .result-axes-title {
@@ -692,10 +755,25 @@ body {
 
   .result-description-card {
     padding: 16px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     font-size: 0.88rem;
     line-height: 1.75;
     border-radius: 12px;
+  }
+
+  .result-video-container {
+    margin-bottom: 24px;
+  }
+
+  .result-video-link {
+    padding: 12px 16px;
+    font-size: 0.86rem;
+    gap: 8px;
+    border-radius: 12px;
+  }
+
+  .result-video-link.active .video-icon {
+    font-size: 1.1rem;
   }
 
   .result-axes-title {
